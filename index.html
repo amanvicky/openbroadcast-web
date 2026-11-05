@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenBroadcast Web — eye gaze correction in your browser</title>
+  <meta name="description" content="Real-time eye gaze correction that runs entirely in your browser. Turn on your camera, look slightly off-camera, and watch the correction pull your eyes back to the lens. Nothing is uploaded.">
+  <meta name="theme-color" content="#0a0e14">
+  <meta property="og:title" content="OpenBroadcast Web — eye gaze correction in your browser">
+  <meta property="og:description" content="Turn on your camera, look slightly off-camera, and watch the correction pull your eyes back to the lens. Runs locally, nothing uploaded.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0e14'/%3E%3Ccircle cx='32' cy='32' r='14' fill='none' stroke='%2300e5a0' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%2300e5a0'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>OpenBroadcast <span>web</span></h1>
+    <p class="sub">Real-time eye gaze correction, entirely in your browser.</p>
+  </header>
+
+  <main>
+    <div class="stage" id="stage">
+      <video id="video" playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div class="status" id="status">starting up…</div>
+      <div class="off-grid hidden" id="offGrid">
+        <div>
+          <p><strong>camera is off</strong></p>
+          <p id="offReason">allow camera access to run the demo</p>
+          <button id="retry">try again</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="toggle" class="primary" disabled>correction: off</button>
+      <label class="slider">strength
+        <input type="range" id="strength" min="0" max="100" value="60">
+      </label>
+      <label class="check"><input type="checkbox" id="showPoints" checked> show tracking</label>
+    </div>
+
+    <section class="explain">
+      <h2>what this does</h2>
+      <p>MediaPipe's face landmarker finds your eyes and irises 30-60 times per second. When your irises drift away from the eye center (you looking at notes, a second screen, the timeline of the meeting you're in), the demo shifts the eye region back toward the lens, so on the call you look like you're paying attention.</p>
+      <p>This is the browser version of <a href="https://github.com/amanvicky/Open-Broadcast" target="_blank" rel="noopener">OpenBroadcast</a>, which does the same job with trained models, a calibration wizard and better warping. This one trades quality for the fact that you just clicked a link and it worked.</p>
+      <p class="privacy">Frames are processed on your device and never uploaded anywhere. View source if you don't believe me.</p>
+    </section>
+
+    <section class="explain">
+      <h2>how to use it</h2>
+      <ol>
+        <li>Allow camera access when the browser asks.</li>
+        <li>Look at your camera. The dots on your eyes should sit near the center.</li>
+        <li>Now look slightly down or to the side, like you're reading notes. The dots drift with you.</li>
+        <li>Hit <em>correction: on</em>. Your eyes get pulled back toward the camera while the rest of your face stays honest.</li>
+      </ol>
+      <p>Works best with decent lighting. If the dots don't show up, move back a little so your whole face is in frame.</p>
+    </section>
+  </main>
+
+  <footer>
+    <a href="https://github.com/amanvicky/openbroadcast-web" target="_blank" rel="noopener">source</a>
+    <a href="https://github.com/amanvicky/Open-Broadcast" target="_blank" rel="noopener">desktop version</a>
+    <a href="https://github.com/amanvicky" target="_blank" rel="noopener">more from me</a>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
