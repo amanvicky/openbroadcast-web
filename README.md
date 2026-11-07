@@ -33,5 +33,6 @@ Frames never leave the device — there is no backend to upload to. The only net
 
 - [Open-Broadcast](https://github.com/amanvicky/Open-Broadcast) — the desktop app: trained iris-segmentation models, calibration wizard, virtual camera for Zoom, Teams and OBS
 - [Gazester](https://github.com/amanvicky/Gazester) — the research prototype this whole line of work grew out of
+- [gaze-meter](https://github.com/amanvicky/gaze-meter) — the measurement half: blinks/min, off-center %, focus score for your own sessions
 
 MIT licensed.
