@@ -1,38 +1,37 @@
-# OpenBroadcast Web
+# OpenBroadcast Web — eye gaze correction, no install
 
-Real-time eye gaze correction that runs in your browser. Turn on your camera, look slightly off-camera (at your notes, your second screen), and watch the correction pull your eyes back to the lens.
+Live at **https://amanvicky.github.io/openbroadcast-web/** — allow the camera, look away like you're reading notes, flip correction on, watch your eyes get pulled back to the lens. That's the whole pitch.
 
-**Live: https://amanvicky.github.io/openbroadcast-web/**
+Three files, no build step, no server, no account: `app.js` (all of the logic, ~7 KB), `index.html` (the page and its copy), `style.css`.
 
-No install, no account, no upload. The face model (~3 MB) downloads once per visit from Google's CDN, and every frame after that is processed on your device.
+## How the correction works
 
-## How it works
+1. MediaPipe's FaceLandmarker (WASM + GPU delegate, tasks-vision 0.10.14) tracks the 478-point face mesh 30–60 times per second. The model (~3 MB, float16) downloads once per visit.
+2. From that mesh the code reads the iris centers (landmarks **468** left / **473** right) and each eye's box — outer 33, inner 133, top 159, bottom 145 on the left; 263 / 362 / 386 / 374 on the right.
+3. Gaze = how far the iris sits from the eye-box center, **normalized by eye width**, so the math works at any camera distance. Left and right are averaged, then smoothed with an exponential factor of 0.35 so the correction doesn't twitch between frames.
+4. When correction is on, the region around each eye — 2.4× the eye width, cut out with a radial-gradient feathered mask so the patch has no visible seam — is redrawn shifted **opposite** the gaze offset, scaled by the strength slider. The rest of the face is untouched.
 
-1. MediaPipe's face landmarker finds 478 face landmarks, including the iris centers, 30-60 times per second.
-2. For each eye it measures how far the iris sits from the eye center, in eye-widths.
-3. When correction is on, an oval patch around each eye gets shifted back toward the center, with feathered edges so it blends into the frame. The rest of your face stays untouched.
+Result: your eyes return to the lens; everything else stays honest.
 
-It's the browser version of [OpenBroadcast](https://github.com/amanvicky/Open-Broadcast), my desktop app that does the same job with trained iris-segmentation models, a calibration wizard and better warping. This one trades quality for being a link you can just click.
+## Controls
 
-## Running it locally
-
-Any static server works:
-
-```bash
-python -m http.server 8000
-# open http://localhost:8000
-```
-
-The page must be served over http(s) — `file://` won't get camera access.
-
-## What it isn't
-
-This is a demo, not the desktop app. The warp is geometric (no learned model), there's no temporal blending or virtual camera, and strong glasses or bad lighting will upset it. For the real thing, use [OpenBroadcast](https://github.com/amanvicky/Open-Broadcast).
+- **correction: on / off** — the toggle
+- **strength** slider (default 60) — how hard the eyes get pulled; the pixel shift is gaze × canvas width × 0.045 × strength
+- **show tracking** — debug overlay: eye centers as green circles, iris dots, and the offset line between them. Watching the dots drift when you look away is half the demo.
 
 ## Privacy
 
-Frames never leave your device. There is no backend. The only network requests are the CDN files (MediaPipe wasm + model weights) and GitHub Pages itself. View source, it's four files.
+Frames never leave the device — there is no backend to upload to. The only network requests are the MediaPipe model and WASM from their CDN. "View source if you don't believe me" is the entire privacy policy.
 
-## License
+## Limits
 
-MIT
+- Needs `getUserMedia` (so https or localhost) and the GPU delegate — current Chrome, Edge and Firefox are fine
+- Lighting matters more than camera quality; if the tracking dots vanish, move back so your whole face is in frame
+- This shifts the eye region — it doesn't rebuild it. Extreme angles will show artifacts; the desktop version's trained models are what handle those
+
+## The family
+
+- [Open-Broadcast](https://github.com/amanvicky/Open-Broadcast) — the desktop app: trained iris-segmentation models, calibration wizard, virtual camera for Zoom, Teams and OBS
+- [Gazester](https://github.com/amanvicky/Gazester) — the research prototype this whole line of work grew out of
+
+MIT licensed.
